@@ -1,9 +1,9 @@
 <?php
+
+$type = "any";
 //alle if statements hieronder zijn bijna exact hetzelfde dus ik leg met tags de bovenste uit en de extra opdracht
 //als we een post variabel hebben gekregen uit een form van de vorige pagina die als naam 'DtoBin' heeft voer dan de rest van de code uit.
 if (isset($_POST['DtoBin'])) {
-  //echo op de pagina welke som de gebruiker heeft aangeklikt
-  echo "DEC TO BIN";
 
   //als de gebruiker een waarde heeft ingevoerd in de rekenmachine voer dan de rest van de code uit
   if (isset($_POST['ORIGIN'])) {
@@ -13,48 +13,53 @@ if (isset($_POST['DtoBin'])) {
     //zet de formulier php variabel om van decimaal naar binary en sla het op in een nieuwe variabel genaamd 'answer' (antwoord)
     $answer = decbin($origin);
 
-    //ik was vanplan ook nog voor de gebruiker aan te geven welk type variabel er nu in hun balk zat (ik vul automatisch hun output weer in de input balk) maar ik was daar niet meer aan toe gekomen nadat ik bij de laatste verplichte opdracht was
+    //ik geef de original type aan zodat ik kan aangeven welke conversion het laatst is gebruik
+    $originalType = "Dec";
+
+    //met onderstaande variabele kan de gebruiker zien welk type getal ze in hun balk hebben gekregen
     $type = "Bin";
   }
 }
 if (isset($_POST['BtoDEC'])) {
-  echo "BIN TO DEC";
 
   if (isset($_POST['ORIGIN'])) {
     $origin = $_POST['ORIGIN'];
 
     $answer = bindec($origin);
 
+    $originalType = "Bin";
     $type = "Dec";
   }
 }
 
 if (isset($_POST['DtoHEX'])) {
-  echo "DEC TO HEX";
+
 
   if (isset($_POST['ORIGIN'])) {
     $origin = $_POST['ORIGIN'];
 
     $answer = dechex($origin);
 
+    $originalType = "Dec";
     $type = "Hex";
   }
 }
 if (isset($_POST['HtoDEC'])) {
-  echo "HEX TO DEC";
+
 
   if (isset($_POST['ORIGIN'])) {
     $origin = $_POST['ORIGIN'];
 
     $answer = hexdec($origin);
 
-    $type = "Bin";
+    $originalType = "Hex";
+    $type = "Dec";
   }
 }
 
 //dit was de extra opdracht, bijna precies hetzelfde als alle andere if-statements met een kleine verandering :)
 if (isset($_POST['BtoHEX'])) {
-  echo "BIN TO HEX";
+
 
   if (isset($_POST['ORIGIN'])) {
     $origin = $_POST['ORIGIN'];
@@ -67,17 +72,20 @@ if (isset($_POST['BtoHEX'])) {
     //vervolgens zetten we de decimal om naar hexadecimal
     $answer = dechex($answer);
 
+    $originalType = "Bin";
     $type = "Hex";
   }
 }
 if (isset($_POST['HtoBIN'])) {
-  echo "HEX TO BIN";
+
 
   if (isset($_POST['ORIGIN'])) {
     $origin = $_POST['ORIGIN'];
 
     $answer = hexdec($origin);
     $answer = decbin($answer);
+
+    $originalType = "Hex";
     $type = "Bin";
   }
 }
@@ -105,19 +113,43 @@ if (isset($_POST['HtoBIN'])) {
     <form action="index.php" method="post">
       <!-- in de input hieronder vragen we om een waarde voor de rekenmachine, die word vervolgens doorgestuurd met de naam "ORIGIN" (afkomst) -->
       <!-- met  de if-statement:  if (isset($answer)){echo $answer;}  - kijken we of er een $answer variable bestaat, zoja dan voeren we die automatisch in de balk-->
-      <!-- met de andere ifstatement was ik vanplan een functie in te voeren dat als de gebruiker een foutieve knop had ingeklikt voor hun waarde dat hun balk niet geleegd zou worden en dat hun werd verteld om een andere knop te gebruiken die wel van toepassing was van hun invoer. (ik was hier niet meer aan toe gekomen) -->
-
-      getal: <input type="text" name="ORIGIN" value="<?php if (isset($answer)) {
-                                                        echo $answer;
-                                                      } else if (isset($origin)) {
-                                                        echo $origin;
-                                                      } ?>"><br>
-      <button type='submit' name='DtoBin'>DEC->BIN</button>
-      <button type='submit' name='BtoDEC'>BIN->DEC</button>
+ 
+      <?php if (isset($answer)) {
+        echo $type . " ";
+      }if ($type == "any") {
+        echo "I've given you a Hex type number ";
+      } ?>getal: <input type="text" name="ORIGIN" value="<?php if (isset($answer)) {
+                                                            echo $answer;
+                                                          } else if (!isset($answer)) {
+                                                            echo "f7d6ff";
+                                                          } ?>"><br>
+      <?php
+      if ($type == "any") {
+        echo "
+        <button type='submit' name='DtoBin'>DEC->BIN</button>
+        <button type='submit' name='BtoDEC'>BIN->DEC</button>
       <button type='submit' name='DtoHEX'>DEC->HEX</button>
       <button type='submit' name='HtoDEC'>HEX->DEC</button>
       <button type='submit' name='BtoHEX'>BIN->HEX</button>
-      <button type='submit' name='HtoBIN'>HEX->BIN</button>
+      <button type='submit' name='HtoBIN'>HEX->BIN</button>";
+      } else if ($type == "Bin") {
+        echo "
+        <button type='submit' name='BtoDEC'>BIN->DEC</button>
+        <button type='submit' name='BtoHEX'>BIN->HEX</button>
+      ";
+      } else if ($type == "Dec") {
+        echo "
+        <button type='submit' name='DtoBin'>DEC->BIN</button>
+        <button type='submit' name='DtoHEX'>DEC->HEX</button>
+      ";
+      } else if ($type == "Hex") {
+        echo "
+        <button type='submit' name='HtoDEC'>HEX->DEC</button>
+        <button type='submit' name='HtoBIN'>HEX->BIN</button>
+      ";
+      }
+
+      ?>
     </form>
 
 
@@ -127,7 +159,15 @@ if (isset($_POST['HtoBIN'])) {
       echo "<p>Antwoord:</p>";
       // hier laten we de resultaten van de rekenmachine zien op de pagina
       echo "<p>" .  $origin . "->" .  $answer . "</p>";
-    } ?>
+    }
+
+    //if the conversion output type is hex then we show the hex color :33
+    if ($type == "Hex") {
+      // hier laten we de kleur in een div zien
+      echo '<div style=" border-radius: 16px; border: 2px solid black; background-color:#' . $answer . ';"><center><br>the hex in color<br> <p></center></div';
+    }
+
+    ?>
   </div>
 </body>
 

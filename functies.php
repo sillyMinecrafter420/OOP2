@@ -79,3 +79,44 @@ function nlDatum($datum, $lengte = "lang")
   // $nlDatum = date("d-m-Y", $phpDatum);
 
 }
+
+$magIkStemmen = "nee";
+function magStemmen($leeftijd){
+
+// vertel de gebruiker welke datum ze hebben ingevoerd
+echo "Uw geboorte datum was op " . $leeftijd . "<br>";
+// achterhaal welke dag het vandaag is 
+$currentDate = date('Y-m-d');
+
+//vertel de gebruiker welke dag het vandaag is
+echo "Vandaag is de datum " . $currentDate . "<br>";
+
+// bereken welke dag 18 jaar geleden is
+$achtienJaarGeleden = date('Y-m-d', strtotime($currentDate . ' -18 years'));
+
+
+
+
+echo "18 jaar geleden was op ".$achtienJaarGeleden . "<br><br>";
+
+  if($leeftijd > $achtienJaarGeleden){
+    $magIkStemmen = "nee";
+    $hoeOud = $currentDate - $leeftijd;
+    //vertel aan de gebruiker dat ze niet mogen stemmen en vertel ook hoe oud ze zijn
+    echo "Dus ". $magIkStemmen . ", jij mag niet stemmen want je bent nog maar ". $hoeOud . " jaar oud";
+    }else if($leeftijd < $achtienJaarGeleden){
+      $magIkStemmen = "ja";
+      $hoeOud = $currentDate - $leeftijd;
+      echo "Dus ". $magIkStemmen . ", U mag stemmen want u bent al " . $hoeOud. " jaar oud";
+    }
+}
+
+if (isset($_POST['submitAge'])) {
+
+
+  if (isset($_POST['AGE'])) {
+    $leeftijd = $_POST['AGE'];
+
+    magStemmen($leeftijd);
+  }
+}
